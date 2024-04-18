@@ -14,7 +14,6 @@ team_t team = {
     " py980627@gmail.com",
     "", ""};
 
-
 /* 8(2워드)의 배수에 맞게 반올림  */
 #define ALIGN(size) (((size) + (DSIZE - 1)) & ~0x7)
 #define SIZE_T_SIZE (ALIGN(sizeof(size_t)))
@@ -62,7 +61,6 @@ int get_class(size_t size);                // 요청한 size가 해당되는 클
 /*전역 변수*/
 static char *heap_listp;         // 힙의 시작 포인트
 static char *class_listp = NULL; // 클래스리스트의 시작 포인트
-
 
 /*----------------------------------------------mm_function()-----------------------------------------------------------*/
 
@@ -195,10 +193,10 @@ static void *extend_heap(size_t words) {
  * find_fit - 요청한 size에 대한 가용블록 찾기
  */
 static void *find_fit(size_t asize) {
-    int class_idx = get_class(asize); // 요청된 size가 segregated_list의 어떤 class에 할당할지 찾기
+    int class_idx; // 요청된 size가 segregated_list의 어떤 class에 할당할지 찾기
     void *bp;
 
-    for (class_idx; class_idx < LISTLIMIT; class_idx++) {
+    for (class_idx = get_class(asize); class_idx < LISTLIMIT; class_idx++) {
         for (bp = GET_ROOT(class_idx); bp != NULL; bp = SUCC_FREEP(bp)) {
             if (GET_SIZE(HDRP(bp)) >= asize) {
                 return bp;
@@ -267,7 +265,7 @@ static void *coalesce(void *bp) {
         PUT(HDRP(bp), PACK(size, 0));                                          // 현재 bp(이전 블록) 기준으로 header 가용블록 설정
     }
 
-    putFreeBlock(bp); //병합 후 가용블록을 가용리스트에 삽입
+    putFreeBlock(bp); // 병합 후 가용블록을 가용리스트에 삽입
     return bp;
 }
 
@@ -307,5 +305,5 @@ int get_class(size_t size) {
             return i;
         class_idx <<= 1;
     }
-    return LISTLIMIT - 1; 
+    return LISTLIMIT - 1;
 }
